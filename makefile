@@ -1,15 +1,21 @@
 CFLAGS = -Wall -g -Wextra -DDebug
 P = readwrite
+O = LinkedList
 
 all: $(P)
 
-$(P): $(P).cpp
-	g++ -c $(P).cpp
+$(P): $(P).o $(O).o
 	g++ -g $(P).o -o $(P)
+
+$(O).o: $(O).cpp $(O).h
+	g++ -c $(O).cpp
+
+$(P).o: $(P).cpp $(O).o
+	g++ -c $(P).cpp
 
 
 clean:
-	rm -rf *.o $(P) *.csv *.png
+	rm -rf *.o $(P) $(O)
 run: all
 	./$(P)
 checkmem: all

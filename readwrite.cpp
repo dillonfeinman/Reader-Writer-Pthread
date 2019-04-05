@@ -2,16 +2,35 @@
 #include <string>
 #include <cstdlib>
 #include <pthread.h>
+#include <list>
+#include "LinkedList.cpp"
 
 using namespace std;
 
-void * write(void *){
-  int randNum = (rand() % 1000);
-  cout << randNum << endl;
+struct args_struct{
+  int i;
+  int n;
+  list<int> * ll;
+};
+
+void * write(void * in){
+  args_struct * args = (args_struct *) in;
+  srand(time(0));
+  int i = (int)args->i;
+  int n = (int)args->n;
+  for(int j = 0; j < n; j++){
+    string ret;
+    int randNum = (rand() % 101);
+    ret = ret + to_string(randNum) + to_string(i);
+    int rn = stoi(ret);
+    args->ll->push_back(rn);
+  }
+  return NULL;
 }
 
-void * read(void *){
-
+void * read(void * in){
+  
+  return NULL;
 }
 
 int main(int argc, char * argv[]){
@@ -29,12 +48,18 @@ int main(int argc, char * argv[]){
     } else {
       pthread_t numRead[r];
       pthread_t numWrite[w];
+      list<int> * linkedList;
       for(int i = 0; i < r || i < w; i++){
         if(i < r){
-          pthread_create(&numRead[i], NULL, read, NULL);
+          args_struct args;
+          args.i = i;
+          args.n = n;
+          args.ll = linkedList;
+          pthread_create(&numRead[i], NULL, read, (void *)&args);
+
         }
         if(i < w){
-          pthread_create(&numWrite[i], NULL, write, NULL);
+          pthread_create(&numWrite[i], NULL, write, (void *)i);
         }
       }
     }
