@@ -16,14 +16,19 @@ struct args_struct{
 void * write(void * in){
   args_struct * args = (args_struct *) in;
   srand(time(0));
+  cout << "where" << endl;
   int i = (int)args->i;
   int n = (int)args->n;
+  cout << "am" << endl;
   for(int j = 0; j < n; j++){
     string ret;
     int randNum = (rand() % 101);
     ret = ret + to_string(randNum) + to_string(i);
     int rn = stoi(ret);
+    cout << "i" << endl;
     args->ll->add(rn);
+    cout << "breaking" << endl;
+
   }
   return NULL;
 }
@@ -68,20 +73,26 @@ int main(int argc, char * argv[]){
       wargs.n = n;
       rargs.ll = linkedList;
       rargs.n = n;
-
+      cout << "get here" << endl;
       pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
       for(int i = 0; i < r; i++){
+        pthread_mutex_lock(&lock);
         if(i < w){
           wargs.i = i;
+          cout << i << ": get here" << endl;
           pthread_create(&numWrite[i], NULL, write, (void *)&wargs);
-          cout << "Writes" << endl;
+          cout << "also here" << endl;
         }
         if(i < r){
           rargs.i = i;
+          cout << i << ": get here read" << endl;
           pthread_create(&numRead[i], NULL, read, (void *)&rargs);
-          cout << "Reads" << endl;
+          cout << "also here read" << endl;
         }
+        pthread_mutex_unlock(&lock);
       }
+      LinkedList * newlinkedList = new LinkedList();
+      linkedList = newlinkedList;
     }
   }
 }
