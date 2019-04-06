@@ -10,7 +10,7 @@ using namespace std;
 struct args_struct{
   int i;
   int n;
-  list<int> * ll;
+  LinkedList * ll;
 };
 
 void * write(void * in){
@@ -23,17 +23,30 @@ void * write(void * in){
     int randNum = (rand() % 101);
     ret = ret + to_string(randNum) + to_string(i);
     int rn = stoi(ret);
-    args->ll->push_back(rn);
+    args->ll->add(rn);
   }
   return NULL;
 }
 
 void * read(void * in){
-  
+  args_struct * args = (args_struct *) in;
+  int i = (int)args->i;
+  int n = (int)args->n;
+  int correct = 0;
+  LinkedList * list = (LinkedList *)args->ll;
+  int count = 1;
+  while(args->ll->getCurrent()->getNext() != NULL){
+    if(list->getNodeData() % 10 == i){
+      correct++;
+    }
+  }
+  cout << "Reader i: Read: "<< count << ": " << correct << " values ending in " << i << "." << endl;
+  count++;
   return NULL;
 }
 
 int main(int argc, char * argv[]){
+
   if(argc != 4){
     cerr << "Needs 3 arguments: <N rand ints> <R readers> <W writers>." << endl;
     exit(1);
@@ -48,18 +61,25 @@ int main(int argc, char * argv[]){
     } else {
       pthread_t numRead[r];
       pthread_t numWrite[w];
-      list<int> * linkedList;
-      for(int i = 0; i < r || i < w; i++){
-        if(i < r){
-          args_struct args;
-          args.i = i;
-          args.n = n;
-          args.ll = linkedList;
-          pthread_create(&numRead[i], NULL, read, (void *)&args);
+      LinkedList * linkedList = new LinkedList();
+      args_struct wargs;
+      args_struct rargs;
+      wargs.ll = linkedList;
+      wargs.n = n;
+      rargs.ll = linkedList;
+      rargs.n = n;
 
-        }
+      pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+      for(int i = 0; i < r; i++){
         if(i < w){
-          pthread_create(&numWrite[i], NULL, write, (void *)i);
+          wargs.i = i;
+          pthread_create(&numWrite[i], NULL, write, (void *)&wargs);
+          cout << "Writes" << endl;
+        }
+        if(i < r){
+          rargs.i = i;
+          pthread_create(&numRead[i], NULL, read, (void *)&rargs);
+          cout << "Reads" << endl;
         }
       }
     }

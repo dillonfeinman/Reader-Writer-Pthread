@@ -22,9 +22,10 @@ public:
 	~LinkedList();
 	void print();
 	void reset();
-	bool next();
 	bool remove(int);
 	void add(int);
+	int getNodeData();
+	Node * getCurrent();
 };
 
 

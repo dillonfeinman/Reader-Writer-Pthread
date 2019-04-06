@@ -13,49 +13,36 @@ LinkedList::~LinkedList(){
 		current = current->getNext();
   }
 }
-
-bool LinkedList::next(){
-	if(current != NULL){
-		current = current->getNext();
-	}
-	if(current == NULL){
-		current = head;
-		return false;
-	} else {
-		return true;
-	}
-}
-
 void LinkedList::reset(){
 	this->current = this->head;
 }
 
 void LinkedList::print(){
 	this->reset();
-	while(next()){
+	while(current->getNext() != NULL){
 		std::cout << current->getData() << ", ";
+		current = current->getNext();
+	}
+	if(current != NULL){
+		std::cout << current->getData() << ".";
 	}
 	std::cout << std::endl;
 }
 
 void LinkedList::add(int x){
+	this->reset();
 	if(head == NULL){
 		Node * n = new Node(x);
 		head = current = n;
 		return;
 	}
-	else if(current == NULL){
-		current = head;
-	}
 	else {
 		Node * n = new Node(x);
-		while(current != NULL){
-			if(current->getNext() == NULL){
-				current->setNext(n);
-			}
+		while(current->getNext() != NULL){
 			current = current->getNext();
 		}
-		current = n;
+		current->setNext(n);
+		current = current->getNext();
 		current->setNext(NULL);
 	}
 	return;
@@ -79,7 +66,13 @@ Node * Node::getNext(){
 		return this->next;
 	}
 }
+Node * LinkedList::getCurrent(){
+	return this->current;
+}
 int Node::getData(){
 	return this->data;
 
+}
+int LinkedList::getNodeData(){
+	return current->getData();
 }
