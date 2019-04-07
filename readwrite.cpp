@@ -73,21 +73,16 @@ int main(int argc, char * argv[]){
       wargs.n = n;
       rargs.ll = linkedList;
       rargs.n = n;
-      cout << "get here" << endl;
       pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
       for(int i = 0; i < r; i++){
         pthread_mutex_lock(&lock);
         if(i < w){
           wargs.i = i;
-          cout << i << ": get here" << endl;
           pthread_create(&numWrite[i], NULL, write, (void *)&wargs);
-          cout << "also here" << endl;
         }
         if(i < r){
           rargs.i = i;
-          cout << i << ": get here read" << endl;
           pthread_create(&numRead[i], NULL, read, (void *)&rargs);
-          cout << "also here read" << endl;
         }
         pthread_mutex_unlock(&lock);
       }

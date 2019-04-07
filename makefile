@@ -8,10 +8,10 @@ $(P): $(P).o $(O).o
 	g++ -g $(P).o -o $(P)
 
 $(O).o: $(O).cpp $(O).h
-	g++ -c $(O).cpp
+	g++ -c -g $(O).cpp
 
 $(P).o: $(P).cpp $(O).o
-	g++ -c $(P).cpp
+	g++ -c -g $(P).cpp
 
 
 clean:
