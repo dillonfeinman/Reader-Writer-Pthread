@@ -16,19 +16,15 @@ struct args_struct{
 void * write(void * in){
   args_struct * args = (args_struct *) in;
   srand(time(0));
-  cout << "where" << endl;
   int i = (int)args->i;
   int n = (int)args->n;
-  cout << "am" << endl;
   for(int j = 0; j < n; j++){
     string ret;
     int randNum = (rand() % 101);
     ret = ret + to_string(randNum) + to_string(i);
     int rn = stoi(ret);
-    cout << "i" << endl;
     args->ll->add(rn);
-    cout << "breaking" << endl;
-
+    args->ll->print();
   }
   return NULL;
 }
@@ -40,11 +36,13 @@ void * read(void * in){
   int correct = 0;
   LinkedList * list = (LinkedList *)args->ll;
   int count = 1;
-  while(args->ll->getCurrent()->getNext() != NULL){
+  args->ll->reset();
+  do{
+    cout << list->getNodeData() << endl;
     if(list->getNodeData() % 10 == i){
       correct++;
     }
-  }
+  } while(args->ll->next() == true);
   cout << "Reader i: Read: "<< count << ": " << correct << " values ending in " << i << "." << endl;
   count++;
   return NULL;
@@ -66,15 +64,15 @@ int main(int argc, char * argv[]){
     } else {
       pthread_t numRead[r];
       pthread_t numWrite[w];
-      LinkedList * linkedList = new LinkedList();
       args_struct wargs;
       args_struct rargs;
-      wargs.ll = linkedList;
       wargs.n = n;
-      rargs.ll = linkedList;
       rargs.n = n;
       pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
       for(int i = 0; i < r; i++){
+        LinkedList * linkedList = new LinkedList();
+        rargs.ll = linkedList;
+        wargs.ll = linkedList;
         pthread_mutex_lock(&lock);
         if(i < w){
           wargs.i = i;
@@ -86,8 +84,6 @@ int main(int argc, char * argv[]){
         }
         pthread_mutex_unlock(&lock);
       }
-      LinkedList * newlinkedList = new LinkedList();
-      linkedList = newlinkedList;
     }
   }
 }

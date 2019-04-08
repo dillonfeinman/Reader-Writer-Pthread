@@ -21,6 +21,7 @@ public:
 	LinkedList();
 	~LinkedList();
 	void print();
+	bool next();
 	void reset();
 	bool remove(int);
 	void add(int);

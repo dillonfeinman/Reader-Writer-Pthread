@@ -47,7 +47,15 @@ void LinkedList::add(int x){
 	}
 	return;
 }
-
+bool LinkedList::next(){
+	if(current->getNext() != NULL){
+		this->current = this->current->getNext();
+		return true;
+	} else {
+		current = head;
+		return false;
+	}
+}
 
 Node::Node(int x){
 	this->data = x;
