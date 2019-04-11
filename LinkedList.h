@@ -2,22 +2,20 @@
 #define LINKEDLIST_H
 
 class Node{
-private:
+public:
 	int data;
 	Node * next;
-public:
+
 	Node(int);
 	Node(int, Node *);
-	Node * getNext();
-	int getData();
 	void setNext(Node *);
 };
 
 class LinkedList{
-private:
+public:
 	Node * head;
 	Node * current;
-public:
+
 	LinkedList();
 	~LinkedList();
 	void print();
@@ -25,8 +23,6 @@ public:
 	void reset();
 	bool remove(int);
 	void add(int);
-	int getNodeData();
-	Node * getCurrent();
 };
 
 

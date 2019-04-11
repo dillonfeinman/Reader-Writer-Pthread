@@ -1,17 +1,17 @@
-CFLAGS = -Wall -g -Wextra -DDebug
+CFLAGS = -Wall -g -Wextra -DDebug -pthread
 P = readwrite
 O = LinkedList
 
 all: $(P)
 
 $(P): $(P).o $(O).o
-	g++ -g $(P).o -o $(P)
+	g++ $(CFLAGS) $(P).o -o $(P)
 
 $(O).o: $(O).cpp $(O).h
-	g++ -c -g $(O).cpp
+	g++ -c $(CFLAGS) $(O).cpp
 
 $(P).o: $(P).cpp $(O).o
-	g++ -c -g $(P).cpp
+	g++ -c $(CFLAGS) $(P).cpp
 
 
 clean:
