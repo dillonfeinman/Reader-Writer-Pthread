@@ -11,10 +11,13 @@ struct args_struct{
   int i;
   int n;
   LinkedList * ll;
+  pthread_mutex_t mutex;
 };
 
 void * write(void * in){
   args_struct * args = (args_struct *) in;
+  pthread_mutex_t lock = args->mutex;
+  pthread_mutex_lock(&lock);
   srand(time(0));
   int i = (int)args->i;
   int n = (int)args->n;
@@ -22,15 +25,19 @@ void * write(void * in){
     string ret;
     int randNum = (rand() % 101);
     ret = ret + to_string(randNum) + to_string(i);
-    int rn = stoi(ret);
-    args->ll->add(rn);
-    args->ll->print();
+    if(ret != ""){
+      int rn = stoi(ret);
+      args->ll->add(rn);
+    }
   }
+  pthread_mutex_unlock(&lock);
   return NULL;
 }
 
 void * read(void * in){
   args_struct * args = (args_struct *) in;
+  pthread_mutex_t lock = args->mutex;
+  pthread_mutex_lock(&lock);
   int i = (int)args->i;
   int n = (int)args->n;
   int correct = 0;
@@ -45,6 +52,7 @@ void * read(void * in){
   } while(args->ll->next() == true);
   cout << "Reader i: Read: "<< count << ": " << correct << " values ending in " << i << "." << endl;
   count++;
+  pthread_mutex_unlock(&lock);
   return NULL;
 }
 
@@ -62,25 +70,26 @@ int main(int argc, char * argv[]){
       exit(2);
       //start code
     } else {
-      pthread_t numRead[r];
-      pthread_t numWrite[w];
       args_struct wargs;
       args_struct rargs;
       wargs.n = n;
       rargs.n = n;
       pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-      for(int i = 0; i < r; i++){
+      for(int i = 0; i < r || i < w; i++){
+        pthread_t numRead;
+        pthread_t numWrite;
         LinkedList * linkedList = new LinkedList();
         rargs.ll = linkedList;
         wargs.ll = linkedList;
-        pthread_mutex_lock(&lock);
+        rargs.mutex = lock;
+        wargs.mutex = lock;
         if(i < w){
           wargs.i = i;
-          pthread_create(&numWrite[i], NULL, write, (void *)&wargs);
+          pthread_create(&numWrite, NULL, write, (void *)&wargs);
         }
         if(i < r){
           rargs.i = i;
-          pthread_create(&numRead[i], NULL, read, (void *)&rargs);
+          pthread_create(&numRead, NULL, read, (void *)&rargs);
         }
         pthread_mutex_unlock(&lock);
       }
