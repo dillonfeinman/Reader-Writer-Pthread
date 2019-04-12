@@ -101,7 +101,12 @@ void * write(void * in){
   	 	list->tail->next = n;
 		list->tail = n;
 	  }
-
+	node *tmp = list->head;
+    while(tmp->next != NULL){
+		cout << tmp->val << "->";
+		tmp = tmp->next;
+    }	
+    cout << tmp->val << endl;
 	  //Exit
   	  pthread_mutex_unlock(&re);
   	  pthread_mutex_unlock(&rt);
@@ -109,12 +114,6 @@ void * write(void * in){
 	  usleep(50);
     }
     cout << "done" << endl;
-    node *tmp = list->head;
-    while(tmp!=list->tail){
-	cout << tmp->val << "->";
-	tmp = tmp->next;
-    }
-    cout << endl;
     return NULL;
 }
 
@@ -139,7 +138,7 @@ int main(int argc, char * argv[]){
             for(int i = 0; i < w; i++){
                 int *v = (int *)malloc(sizeof(int));
 		*v = i+1;
-                pthread_create(&writers[w], NULL, write, v);
+                pthread_create(&writers[i], NULL, write, v);
             }
             for(int i = 0; i < r; i++){
                 int *v = (int *)malloc(sizeof(int));
