@@ -15,7 +15,9 @@ void * write(void * in){
     int *input = (int *) in;
     int threadID = input[0];
     int num = input[1];
+    cout  <<"w1" << endl;
     buff.insert(threadID, num);
+    cout << "w2" << endl;
     cout << "leave write" << endl;
 }
 
@@ -25,8 +27,13 @@ void * read(void * in){
     int threadID = input[0];
     int num = input[1];
     int *readCount;
+
+    cout << "r1" << endl;
+
     readCount = buff.read(threadID, num);
-    
+
+    cout << "r2" << endl;
+
     //file output
     string outfile = "reader_";
     outfile += to_string(threadID);
