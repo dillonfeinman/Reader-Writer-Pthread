@@ -3,17 +3,18 @@
 
 #include <pthread.h>
 
-class rwlock_t{
+class rwlock{
 private:
     pthread_mutex_t baseLock = PTHREAD_COND_INITIALIZER;
     pthread_cond_t writeLock = PTHREAD_MUTEX_INITIALIZER;
     int readers = 0;
+    
 public:
-    rwlock_t();
-    void rwlock_acquire_readlock(rwlock_t *rw);
-    void rwlock_release_readlock(rwlock_t *rw);
-    void rwlock_acquire_writelock(rwlock_t *rw);
-    void rwlock_release_writelock(rwlock_t *rw);
+    rwlock();
+    void rwlock_acquire_readlock();
+    void rwlock_release_readlock();
+    void rwlock_acquire_writelock();
+    void rwlock_release_writelock();
 };
 
 #endif
