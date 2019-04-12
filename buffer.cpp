@@ -16,7 +16,7 @@ bool writer = false;
 int reads = 0;
 
 void buffer::insert(int thrId, int num){
-    //cout << "thread: " << thrId << "insert start" << endl;
+    cout << "thread: " << thrId << "insert start" << endl;
     for(int i = 0; i < num; i++){
 	if(reads==0){
 		pthread_mutex_lock(&wl);

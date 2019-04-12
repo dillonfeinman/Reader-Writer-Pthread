@@ -9,36 +9,40 @@
 
 using namespace std;
 
+pthread_mutex_t o;
 buffer buff;
 int num, readers;
 
 void * write(void * in){
     int *input = (int *) in;
     int threadID = *input;
-    buff.insert(threadID, num);
+    //buff.insert(threadID, num);
+	//cout << "write done" << endl;
 }
 
 void * read(void * in){
     int *input = (int *) in;
     int threadID = *input;
-    int *readCount;
+    int *readCount = (int *)malloc(sizeof(int)*num);
+	//cout << "r" << threadID << endl;
+    //cout << "r1" << endl;
 
-    cout << "r1" << endl;
+    //readCount = buff.read(threadID, num);
 
-    readCount = buff.read(threadID, num);
+    //cout << "r2" << endl;
 
-    cout << "r2" << endl;
-
-    //file output --> might be broken never gets to print r3
+    //file output
     string outfile = "reader_" + to_string(threadID) + ".txt";
     
-    //cout << outfile << endl;
+    cout << outfile << endl;
 
     ofstream out (outfile);
-    for(int i = 0; i < num; i++){
-        cout << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
-    }
+	pthread_mutex_lock(&o);
+    //for(int i = 0; i < num; i++){
+    //    cout << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
+    //}
     out.close();
+	pthread_mutex_unlock(&o);
     cout << "read done" << endl;
 }
 
@@ -56,18 +60,21 @@ int main(int argc, char * argv[]){
             exit(2);
         } else {
             buff = buffer();
-            for(int j = 0; j <= w; j++){
+			pthread_t writer;
+            for(int j = 0; j < w; j++){
                 int *in = (int *)malloc(sizeof(int));
-		*in  = j+1;
-                pthread_t writer;
+				*in  = j+1;
                 pthread_create(&writer, NULL, write, (void *) in);
+				
             }
+			pthread_t reader;
             for(int k = 0; k < r; k++){
                 int *in = (int *)malloc(sizeof(int));
-		*in = k+1;
-                pthread_t reader;
-                //pthread_create(&reader, NULL, read, (void *) in);
+				*in = k+1;
+                pthread_create(&reader, NULL, read, (void *) in);
             }
+			pthread_join(writer, NULL);
+			pthread_join(reader, NULL);
         }
     }
 
