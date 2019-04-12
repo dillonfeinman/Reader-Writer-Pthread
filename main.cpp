@@ -17,24 +17,17 @@ void * write(void * in){
     int *input = (int *) in;
     int threadID = *input;
     //buff.insert(threadID, num);
-	//cout << "write done" << endl;
 }
 
 void * read(void * in){
     int *input = (int *) in;
     int threadID = *input;
     int *readCount = (int *)malloc(sizeof(int)*num);
-	//cout << "r" << threadID << endl;
-    //cout << "r1" << endl;
 
     //readCount = buff.read(threadID, num);
 
-    //cout << "r2" << endl;
-
     //file output
     string outfile = "reader_" + to_string(threadID) + ".txt";
-    
-    cout << outfile << endl;
 
     ofstream out (outfile);
     for(int i = 0; i < num; i++){
