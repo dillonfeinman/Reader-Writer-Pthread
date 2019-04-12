@@ -37,13 +37,10 @@ void * read(void * in){
     cout << outfile << endl;
 
     ofstream out (outfile);
-	pthread_mutex_lock(&o);
-    //for(int i = 0; i < num; i++){
-    //    cout << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
-    //}
+    for(int i = 0; i < num; i++){
+        out << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
+    }
     out.close();
-	pthread_mutex_unlock(&o);
-    cout << "read done" << endl;
 }
 
 int main(int argc, char * argv[]){
