@@ -1,28 +1,19 @@
 #include <pthread.h>
+#include "node.h"
+#include "llist.h"
 #include <fstream>
 #include <string>
+#include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
 
 using namespace std;
-
-struct node{
-    int val;
-    node *next;
-};
-
-struct llist{
-    node *head;
-    node *curr;
-};
-
-llist l;
-l.head = NULL;
-l.curr = NULL;
 
 int num;
 
 int reader = 0;
 int writer = 0;
+llist *list;
 
 pthread_mutex_t rm = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wm = PTHREAD_MUTEX_INITIALIZER;
@@ -48,17 +39,17 @@ void * read(void * in){
         pthread_mutex_unlock(&rt);
 
         //Critical section
-        cout << "r" << thr << endl;
 
         //Read list
-        /*node *tmp = llist.head;
+        node *tmp = list->head;
         int k = 0;
-        while(tmpv!= NULL){
-            if((tmp->val%10) == thr){
+        while(tmp->val != NULL){
+            if((tmp->val % 10) == thr){
                 count[k]++;
             }
             tmp = tmp->next;
-        }*/
+	    k++;
+        }
         //////////
 
 
@@ -76,49 +67,59 @@ void * read(void * in){
 
     ofstream o (out);
     for(int i = 0; i < num; i++){
-        out << "Reader " << thr << ": Read " << count[i] << " values ending in " << thr << endl; 
+        o << "Reader " << thr << ": Read " << count[i] << " values ending in " << thr << endl; 
     }
     o.close();
 }
 
 void * write(void * in){
-    //Entry
-    pthread_mutex_lock(&wm);
-    writer++;
-    if(writer==1){
-        pthread_mutex_lock(&rt);
+    for(int e = 0; e < num; e++){
+    	  pthread_mutex_lock(&wm);
+          pthread_mutex_lock(&rt);
+  	  pthread_mutex_lock(&re);
+
+	  //Critical section
+  	  int *input = (int *) in;
+  	  int thr = *input;
+
+	  cout << thr << endl;
+
+  	  int val;
+  	  for(;;){
+  	      val = rand()%1000 + 1;
+  	      if((val%10)==thr){
+  	          break;
+  	      }
+  	  }
+
+	  if(list->head == NULL){
+		node *n = new node(val);
+		list->head = n;
+		list->tail = n;
+	  } else {
+  	  	node *n = new node(val);
+  	 	list->tail->next = n;
+		list->tail = n;
+	  }
+
+	  //Exit
+  	  pthread_mutex_unlock(&re);
+  	  pthread_mutex_unlock(&rt);
+  	  pthread_mutex_unlock(&wm);
+	  usleep(50);
     }
-    pthread_mutex_unlock(&wm);
-
-    //Critical section
-    pthread_mutex_lock(&re);
-    /*int *input = (int *) in;
-    int val;
-    for(;;){
-        val = rand()%1000 + 1;
-        if((val%10)==thr){
-            break;
-        }
+    cout << "done" << endl;
+    node *tmp = list->head;
+    while(tmp!=list->tail){
+	cout << tmp->val << "->";
+	tmp = tmp->next;
     }
-    l.curr = l.head;
-    while(l.curr->next != NULL){
-        l.curr = l.curr->next;
-    }*/
-    cout << "w" << thr << endl;
-
-
-    pthread_mutex_unlock(&re);
-
-    //Exit
-    pthread_mutex_lock(&wm);
-    writer--;
-    if(writer==0){
-        pthread_mutex_unlock(&rt);
-    }
-    pthread_mutex_unlock(&wm);
+    cout << endl;
+    return NULL;
 }
 
 int main(int argc, char * argv[]){
+    list = new llist();
     if(argc != 4){
       cerr << "Needs 3 arguments: <N rand ints> <R readers> <W writers>." << endl;
       exit(1);
@@ -136,20 +137,22 @@ int main(int argc, char * argv[]){
             
             //Create threads
             for(int i = 0; i < w; i++){
-                int *v = &i;
+                int *v = (int *)malloc(sizeof(int));
+		*v = i+1;
                 pthread_create(&writers[w], NULL, write, v);
             }
             for(int i = 0; i < r; i++){
-                int *v = &i;
-                pthread_create(&readers[r], NULL, read, v);
+                int *v = (int *)malloc(sizeof(int));
+		*v = i+1;
+                //pthread_create(&readers[r], NULL, read, v);
             }
 
             //rejoin threads
             for(int i = 0; i < w; i++){
-                pthread_join(&writers[i], NULL);
+                pthread_join(writers[i], NULL);
             }
             for(int i = 0; i < r; i ++){
-                pthread_join(&readers[r], NULL);
+                //pthread_join(readers[r], NULL);
             }
         }
     }
