@@ -2,14 +2,17 @@
 #include "buffer.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 #include <pthread.h>
 #include <unistd.h>
 
-rwlock l = rwlock();
+using namespace std;
+
+//rwlock l = rwlock();
 
 void buffer::insert(int thrId, int num){
     for(int i = 0; i < num; i++){
-	l.rwlock_acquire_writelock();
+	//l.rwlock_acquire_writelock();
 	this->curr = this->head;
         srand(time(0));
         while(this->curr->next != NULL){
@@ -20,10 +23,11 @@ void buffer::insert(int thrId, int num){
         {
             val = rand() % 1000 + 1;
         } while ((val % 10) != thrId);
+	cout << "insert: " << val << endl;;
         node *n = (node *)malloc(sizeof(node));
         *n = node(val);
         this->curr->next = n;
-	l.rwlock_release_writelock();
+	//l.rwlock_release_writelock();
 	//sleep(1);
     }
 }
@@ -35,12 +39,12 @@ int* buffer::read(int thrId, int num){
     }
     for(int i = 0; i < num; i++){
         node *tmp = this->head;
-	l.rwlock_acquire_readlock();
+	//l.rwlock_acquire_readlock();
         while(tmp->next != NULL){
             if((*tmp->val % 10) == thrId){count[i]++;}
             tmp = tmp->next;
         }
-        l.rwlock_release_readlock();
+        //l.rwlock_release_readlock();
 	//sleep(1);
     }
     return count;

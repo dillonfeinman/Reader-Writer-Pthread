@@ -1,4 +1,5 @@
 #include "buffer.h"
+#include "rwLock.h"
 #include <pthread.h>
 #include <iostream>
 #include <stdio.h>
@@ -9,23 +10,22 @@
 using namespace std;
 
 buffer buff;
+int num;
+
+pthread_mutex_t wl;
 
 void * write(void * in){
-    cout << "enter write" << endl;
+    pthread_mutex_lock(&wl);
     int *input = (int *) in;
-    int threadID = input[0];
-    int num = input[1];
-    cout  <<"w1" << endl;
-    buff.insert(threadID, num);
-    cout << "w2" << endl;
-    cout << "leave write" << endl;
+    int threadID = *input;
+    //buff.insert(threadID, num);
+    pthread_mutex_unlock(&wl);
 }
 
 void * read(void * in){
-    cout << "enter read" << endl;
+    //r.rwlock_acquire_readlock();
     int *input = (int *) in;
-    int threadID = input[0];
-    int num = input[1];
+    int threadID = *input;
     int *readCount;
 
     cout << "r1" << endl;
@@ -35,16 +35,17 @@ void * read(void * in){
     cout << "r2" << endl;
 
     //file output
-    string outfile = "reader_";
-    outfile += to_string(threadID);
-    outfile += ".txt";
+    string outfile = "reader_" + to_string(threadID) + ".txt";
+    
+    cout << outfile << endl;
 
     ofstream out (outfile);
     for(int i = 0; i < num; i++){
         out << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
     }
     out.close();
-    cout << "leave read" << endl;
+    cout << "r3" << endl;
+    //r.rwlock_release_readlock();
 }
 
 int main(int argc, char * argv[]){
@@ -53,6 +54,7 @@ int main(int argc, char * argv[]){
       exit(1);
     } else {
         int n = stoi(argv[1]);
+	num = n;
         int r = stoi(argv[2]);
         int w = stoi(argv[3]);
         if(n < 1 || n > 1000 || r < 1 || r > 9 || w < 1 || w > 9){
@@ -61,18 +63,14 @@ int main(int argc, char * argv[]){
         } else {
             buff = buffer();
             for(int i = 0; i < w; i++){
-                int in[2];
-                in[0] = i+1;
-                in[1] = n;
-		cout << "create writer" << endl;
+                int *in = (int *)malloc(sizeof(int));
+		*in  = i+1;
                 pthread_t writer;
                 pthread_create(&writer, NULL, write, (void *) in);
             }
             for(int i = 0; i < r; i++){
-                int in[2];
-                in[0] = i+1;
-                in[1] = n;
-		cout << "create reader" << endl;
+                int *in = (int *)malloc(sizeof(int));
+		*in = i+1;
                 pthread_t reader;
                 pthread_create(&reader, NULL, read, (void *) in);
             }
