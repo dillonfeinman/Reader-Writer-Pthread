@@ -41,7 +41,6 @@ void * write(void * in){
   cout << "Hey2" << endl;
   while(count != n){
     cout << "Hey3" << endl;
-    cout << pthread_mutex_trylock(&wmutex) << endl;
     pthread_mutex_lock(&wmutex);
     cout << "wmutex acquired" << endl;
     writecount++;
@@ -102,7 +101,6 @@ void * read(void * in){
   cout << "Hi2" << endl;
   for(int j = 0; j < n; j++){
     cout << "Hi3" << endl;
-    cout << pthread_mutex_trylock(&readTry) << endl;
     cout << "Hi4" << endl;
     pthread_mutex_lock(&readTry);
     cout << "Hi5" << endl;
