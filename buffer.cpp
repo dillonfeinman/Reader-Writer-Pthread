@@ -8,28 +8,49 @@
 
 using namespace std;
 
-pthread_mutex_t wl;
+pthread_mutex_t wl, test;
 
 void buffer::insert(int thrId, int num){
     for(int i = 0; i < num; i++){
 	pthread_mutex_lock(&wl);
 	this->curr = this->head;
         srand(time(0));
-        while(this->curr->next != NULL){
-            this->curr = this->curr->next;
-        }
-        int val = 0;
-        do
-        {
-            val = rand() % 1000 + 1;
-        } while ((val % 10) != thrId);
-	cout << "insert: " << val << endl;;
-        node *n = (node *)malloc(sizeof(node));
-        *n = node(val);
-        this->curr->next = n;
+	cout << i+1 << ": thread: " << thrId << " enter gen loop" << endl;
+	for(;;){
+		int val = rand() % 1000 + 1;
+		if((val%10)==thrId){
+			cout << "need to insert: " << val << endl;
+			if(this->curr==NULL){
+				//node *n = (node *)malloc(sizeof(node));
+				//node tmp = node(val);
+				//*n = tmp;
+				//this->curr = n;
+				//this->head = this->curr;
+				cout << "val inserted at head" << endl;
+			}
+			else{
+				cout << "non-empty list" << endl;
+				for(;;){
+					if(this->curr->next==NULL){
+						//node *n = (node *)malloc(sizeof(node));
+						//node tmp = node(val);
+						//*n = tmp;
+						//this->curr->next = n;
+					       	break;	
+					} else {
+						this->curr = this->curr->next;
+					}
+					
+				}
+				cout << "val inserted at tail" << endl;
+			}
+			break;
+		}
+	}
 	pthread_mutex_unlock(&wl);
 	nanosleep(0, NULL);
     }
+    cout << "job done" << endl;
 }
 
 int* buffer::read(int thrId, int num){

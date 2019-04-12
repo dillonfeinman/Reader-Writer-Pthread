@@ -15,9 +15,8 @@ int num, readers;
 void * write(void * in){
     int *input = (int *) in;
     int threadID = *input;
-    cout << "w1" << endl;
     buff.insert(threadID, num);
-    cout << "w2" << endl;
+    cout << "write done" << endl;
 }
 
 void * read(void * in){
@@ -25,23 +24,23 @@ void * read(void * in){
     int threadID = *input;
     int *readCount;
 
-    cout << "r1" << endl;
+    //cout << "r1" << endl;
 
     //readCount = buff.read(threadID, num);
 
-    cout << "r2" << endl;
+    //cout << "r2" << endl;
 
-    //file output
+    //file output --> might be broken never gets to print r3
     string outfile = "reader_" + to_string(threadID) + ".txt";
     
-    cout << outfile << endl;
+    //cout << outfile << endl;
 
     ofstream out (outfile);
     for(int i = 0; i < num; i++){
         out << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
     }
     out.close();
-    cout << "r3" << endl;
+    //cout << "r3" << endl;
 }
 
 int main(int argc, char * argv[]){
