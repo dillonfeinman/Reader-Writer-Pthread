@@ -8,11 +8,11 @@
 
 using namespace std;
 
-//rwlock l = rwlock();
+pthread_mutex_t wl;
 
 void buffer::insert(int thrId, int num){
     for(int i = 0; i < num; i++){
-	//l.rwlock_acquire_writelock();
+	pthread_mutex_lock(&wl);
 	this->curr = this->head;
         srand(time(0));
         while(this->curr->next != NULL){
@@ -27,8 +27,8 @@ void buffer::insert(int thrId, int num){
         node *n = (node *)malloc(sizeof(node));
         *n = node(val);
         this->curr->next = n;
-	//l.rwlock_release_writelock();
-	//sleep(1);
+	pthread_mutex_unlock(&wl);
+	nanosleep(0, NULL);
     }
 }
 

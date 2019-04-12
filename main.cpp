@@ -10,20 +10,16 @@
 using namespace std;
 
 buffer buff;
-int num;
-
-pthread_mutex_t wl;
+int num, readers;
 
 void * write(void * in){
-    pthread_mutex_lock(&wl);
     int *input = (int *) in;
     int threadID = *input;
+
     //buff.insert(threadID, num);
-    pthread_mutex_unlock(&wl);
 }
 
 void * read(void * in){
-    //r.rwlock_acquire_readlock();
     int *input = (int *) in;
     int threadID = *input;
     int *readCount;
@@ -45,7 +41,6 @@ void * read(void * in){
     }
     out.close();
     cout << "r3" << endl;
-    //r.rwlock_release_readlock();
 }
 
 int main(int argc, char * argv[]){
