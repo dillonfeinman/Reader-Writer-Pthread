@@ -32,35 +32,46 @@ pthread_mutex_t resource = PTHREAD_MUTEX_INITIALIZER;
 LinkedList * linkedList = (LinkedList *)malloc(sizeof(LinkedList));
 
 void * write(void * in){
+
   args_struct * args = (args_struct *) in;
+
   int i = (int)args->i;
   int n = (int)args->n;
-  for(int i = 0; i < n; i++){
+
+  for(int j = 0; j < n; j++){
+
     pthread_mutex_lock(&wmutex);
+
     writecount++;
+
     if(writecount == 1){
       pthread_mutex_lock(&readTry);
+
     }
     pthread_mutex_unlock(&wmutex);
     pthread_mutex_lock(&resource);
     string ret;
     int randNum = (rand() % 1000) + 1;
-    if(randNum % 10 == i){
-	if(linkedList->head == NULL){
-      Node * n = (Node *)malloc(sizeof(Node));
-      n->data = randNum;
-      linkedList->head = linkedList->current = n;
-      linkedList->current->next = NULL;
+    while(randNum % 10 != i){
+      randNum = (rand() % 1000) + 1;
     }
-    else {
-      Node * n = (Node *)malloc(sizeof(Node));
-      n->data = randNum;
-      while(linkedList->current->next != NULL){
-        linkedList->current = linkedList->current->next;
+    if(randNum % 10 == i){
+	    if(linkedList->head == NULL){
+          Node * n = (Node *)malloc(sizeof(Node));
+          n->data = randNum;
+          linkedList->head = linkedList->current = n;
+          linkedList->current->next = NULL;
       }
-      linkedList->current->next = n;
-      linkedList->current = linkedList->current->next;
-      linkedList->current->next = NULL;
+      else {
+        Node * n = (Node *)malloc(sizeof(Node));
+        n->data = randNum;
+        while(linkedList->current->next != NULL){
+          linkedList->current = linkedList->current->next;
+        }
+        linkedList->current->next = n;
+        linkedList->current = linkedList->current->next;
+        linkedList->current->next = NULL;
+      }
     }
     pthread_mutex_unlock(&resource);
     pthread_mutex_lock(&wmutex);
@@ -69,9 +80,8 @@ void * write(void * in){
       pthread_mutex_unlock(&readTry);
     }
     pthread_mutex_unlock(&wmutex);
-    }
   }
-  usleep(100000);
+  usleep(1000000);
   return NULL;
 }
 
@@ -79,8 +89,8 @@ void * read(void * in){
   args_struct * args = (args_struct *) in;
   int i = (int)args->i;
   int n = (int)args->n;
-  int correct = 0;
-  for(int j = 0; j < n; j++){
+  for(int j = 1; j < n+1; j++){
+    int correct = 0;
     pthread_mutex_lock(&readTry);
     pthread_mutex_lock(&rmutex);
     readcount++;
@@ -90,13 +100,17 @@ void * read(void * in){
     pthread_mutex_unlock(&rmutex);
     pthread_mutex_unlock(&readTry);
     linkedList->current = linkedList->head;
+    cout << "here" <<endl;
     while(linkedList->current->next != NULL){
-      if(linkedList->current->data % 10 == i){
-        correct++;
+
+      if(linkedList->current != NULL){
+        if(linkedList->current->data % 10 == i){
+          correct++;
+        }
+  	    linkedList->current = linkedList->current->next;
       }
-	linkedList->current = linkedList->current->next;
     }
-    cout << correct << endl;
+    cout << "Reader " << i << ": Read " << j << ": " << correct << endl;
     pthread_mutex_lock(&rmutex);
     readcount--;
     if(readcount == 0){
@@ -104,7 +118,7 @@ void * read(void * in){
     }
     pthread_mutex_unlock(&rmutex);
   }
-  usleep(1000);
+  usleep(1000000);
   return NULL;
 }
 
@@ -128,17 +142,27 @@ int main(int argc, char * argv[]){
       rargs.n = n;
       pthread_t * numRead = new pthread_t[r];
       pthread_t * numWrite = new pthread_t[w];
+      linkedList->current = NULL;
+      linkedList->head = NULL;
       for(int i = 0; i < r || i < w; i++){
-        linkedList->current = NULL;
-        linkedList->head = NULL;
+        wargs.i = i+1;
+        rargs.i = i+1;
         if(i < w){
-          wargs.i = i;
+          cout << i;
           pthread_create(&numWrite[i], NULL, write, (void *)&wargs);
         }
         if(i < r){
-          rargs.i = i;
+          cout << i;
           pthread_create(&numRead[i], NULL, read, (void *)&rargs);
         }
+      }
+      for(int i = 0; i < r || i < w; i++){
+      	if(i < w){
+      		pthread_join(numWrite[i], NULL);
+      	}
+      	if(i < r){
+      		pthread_join(numRead[i], NULL);
+      	}
       }
     }
   }
