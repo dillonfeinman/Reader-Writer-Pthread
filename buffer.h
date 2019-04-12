@@ -23,7 +23,7 @@ public:
         curr = nullptr;
     };
     void insert(int, int);
-    void read(int);
+    int read(int);
     ~buffer();
 };
 
