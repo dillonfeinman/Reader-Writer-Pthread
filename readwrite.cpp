@@ -35,7 +35,6 @@ void * write(void * in){
   args_struct * args = (args_struct *) in;
   int i = (int)args->i;
   int n = (int)args->n;
-  int j = 0;
   for(int i = 0; i < n; i++){
     pthread_mutex_lock(&wmutex);
     writecount++;
@@ -45,18 +44,17 @@ void * write(void * in){
     pthread_mutex_unlock(&wmutex);
     pthread_mutex_lock(&resource);
     string ret;
-    int randNum = (rand() % 101);
-    ret = ret + to_string(randNum) + to_string(i);
-    int rn = stoi(ret);
-    if(linkedList->head == NULL){
+    int randNum = (rand() % 1000) + 1;
+    if(randNum % 10 == i){
+	if(linkedList->head == NULL){
       Node * n = (Node *)malloc(sizeof(Node));
-      n->data = rn;
+      n->data = randNum;
       linkedList->head = linkedList->current = n;
       linkedList->current->next = NULL;
     }
     else {
       Node * n = (Node *)malloc(sizeof(Node));
-      n->data = rn;
+      n->data = randNum;
       while(linkedList->current->next != NULL){
         linkedList->current = linkedList->current->next;
       }
@@ -71,6 +69,7 @@ void * write(void * in){
       pthread_mutex_unlock(&readTry);
     }
     pthread_mutex_unlock(&wmutex);
+    }
   }
   usleep(100000);
   return NULL;
@@ -81,7 +80,6 @@ void * read(void * in){
   int i = (int)args->i;
   int n = (int)args->n;
   int correct = 0;
-  int count = 1;
   for(int j = 0; j < n; j++){
     pthread_mutex_lock(&readTry);
     pthread_mutex_lock(&rmutex);
@@ -92,11 +90,11 @@ void * read(void * in){
     pthread_mutex_unlock(&rmutex);
     pthread_mutex_unlock(&readTry);
     linkedList->current = linkedList->head;
-    linkedList->current = linkedList->head;
     while(linkedList->current->next != NULL){
       if(linkedList->current->data % 10 == i){
         correct++;
       }
+	linkedList->current = linkedList->current->next;
     }
     cout << correct << endl;
     pthread_mutex_lock(&rmutex);
