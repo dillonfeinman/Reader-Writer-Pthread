@@ -1,22 +1,20 @@
 CFLAGS = -Wall -g -Wextra -DDebug -pthread
-P = readwrite
-O = LinkedList
 
-all: $(P)
+all: main.o buffer.o rwLock.o
+	g++ $(CFLAGS) main.o buffer.o rwLock.o -o main
 
-$(P): $(P).o $(O).o
-	g++ $(CFLAGS) $(P).o -o $(P)
+main.o: main.cpp buffer.h rwLock.h
+	g++ $(CFLAGS) -c main.cpp
 
-$(O).o: $(O).cpp $(O).h
-	g++ -c $(CFLAGS) $(O).cpp
+buffer.o: buffer.cpp buffer.h rwLock.h
+	g++ $(CFLAGS) -c buffer.cpp
 
-$(P).o: $(P).cpp $(O).o
-	g++ -c $(CFLAGS) $(P).cpp
-
+rwLock.o: rwLock.cpp buffer.h rwLock.h
+	g++ $(CFLAGS) -c rwLock.cpp
 
 clean:
-	rm -rf *.o $(P) $(O)
+	rm -rf *.o main
 run: all
-	./$(P)
+	./main
 checkmem: all
 	valgrind -v --leak-check=full --track-origins=yes ./$(P)

@@ -50,11 +50,20 @@ int main(int argc, char * argv[]){
         } else {
             buff = buffer();
             for(int i = 0; i < w; i++){
-
+                int in[2];
+                in[0] = i+1;
+                in[1] = n;
+                pthread_t writer;
+                pthread_create(&writer, NULL, write, (void *) in);
             }
             for(int i = 0; i < w; i++){
-                
+                int in[2];
+                in[0] = i+1;
+                in[1] = n;
+                pthread_t reader;
+                pthread_create(&reader, NULL, read, (void *) in);
             }
         }
     }
+    return 0;
 }

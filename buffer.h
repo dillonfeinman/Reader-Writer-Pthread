@@ -1,6 +1,9 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 class node{
 public:
     int *val;
@@ -8,7 +11,7 @@ public:
 
     node(int v){
         *val = v;
-        next = nullptr;
+        next = NULL;
     }
 };
 
@@ -19,8 +22,8 @@ private:
 
 public:
     buffer(){
-        head = nullptr;
-        curr = nullptr;
+        head = NULL;
+        curr = NULL;
     };
     void insert(int, int);
     int* read(int, int);
