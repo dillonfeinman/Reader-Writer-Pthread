@@ -16,7 +16,6 @@ void * write(void * in){
     int *input = (int *) in;
     int threadID = *input;
     buff.insert(threadID, num);
-    cout << "write done" << endl;
 }
 
 void * read(void * in){
@@ -33,14 +32,14 @@ void * read(void * in){
     //file output --> might be broken never gets to print r3
     string outfile = "reader_" + to_string(threadID) + ".txt";
     
-    cout << outfile << endl;
+    //cout << outfile << endl;
 
     ofstream out (outfile);
     for(int i = 0; i < num; i++){
-        out << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
+        cout << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
     }
     out.close();
-    cout << "r3" << endl;
+    cout << "read done" << endl;
 }
 
 int main(int argc, char * argv[]){
@@ -57,19 +56,20 @@ int main(int argc, char * argv[]){
             exit(2);
         } else {
             buff = buffer();
-            for(int i = 0; i < w; i++){
+            for(int j = 0; j <= w; j++){
                 int *in = (int *)malloc(sizeof(int));
-		*in  = i+1;
+		*in  = j+1;
                 pthread_t writer;
                 pthread_create(&writer, NULL, write, (void *) in);
             }
-            for(int i = 0; i < r; i++){
+            for(int k = 0; k < r; k++){
                 int *in = (int *)malloc(sizeof(int));
-		*in = i+1;
+		*in = k+1;
                 pthread_t reader;
-                pthread_create(&reader, NULL, read, (void *) in);
+                //pthread_create(&reader, NULL, read, (void *) in);
             }
         }
     }
+
     return 0;
 }
