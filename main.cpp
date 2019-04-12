@@ -11,13 +11,16 @@ using namespace std;
 buffer buff;
 
 void * write(void * in){
+    cout << "enter write" << endl;
     int *input = (int *) in;
     int threadID = input[0];
     int num = input[1];
     buff.insert(threadID, num);
+    cout << "leave write" << endl;
 }
 
 void * read(void * in){
+    cout << "enter read" << endl;
     int *input = (int *) in;
     int threadID = input[0];
     int num = input[1];
@@ -26,7 +29,7 @@ void * read(void * in){
     
     //file output
     string outfile = "reader_";
-    outfile += "";
+    outfile += to_string(threadID);
     outfile += ".txt";
 
     ofstream out (outfile);
@@ -34,6 +37,7 @@ void * read(void * in){
         out << "Reader " << threadID << ": Read " << i+1 << ": " << readCount[i] << " values ending in " << threadID << endl;
     }
     out.close();
+    cout << "leave read" << endl;
 }
 
 int main(int argc, char * argv[]){
@@ -53,13 +57,15 @@ int main(int argc, char * argv[]){
                 int in[2];
                 in[0] = i+1;
                 in[1] = n;
+		cout << "create writer" << endl;
                 pthread_t writer;
                 pthread_create(&writer, NULL, write, (void *) in);
             }
-            for(int i = 0; i < w; i++){
+            for(int i = 0; i < r; i++){
                 int in[2];
                 in[0] = i+1;
                 in[1] = n;
+		cout << "create reader" << endl;
                 pthread_t reader;
                 pthread_create(&reader, NULL, read, (void *) in);
             }

@@ -8,9 +8,9 @@
 rwlock l = rwlock();
 
 void buffer::insert(int thrId, int num){
-    l.rwlock_acquire_writelock();
-    this->curr = this->head;
     for(int i = 0; i < num; i++){
+	l.rwlock_acquire_writelock();
+	this->curr = this->head;
         srand(time(0));
         while(this->curr->next != NULL){
             this->curr = this->curr->next;
@@ -23,25 +23,25 @@ void buffer::insert(int thrId, int num){
         node *n = (node *)malloc(sizeof(node));
         *n = node(val);
         this->curr->next = n;
+	l.rwlock_release_writelock();
+	//sleep(1);
     }
-    l.rwlock_release_writelock();
-    sleep(1);
 }
 
 int* buffer::read(int thrId, int num){
-    l.rwlock_acquire_readlock();
     int *count = (int *)malloc(num*sizeof(int));
     for(int i = 0; i < num; i++){
         count[i] = 0;
     }
     for(int i = 0; i < num; i++){
         node *tmp = this->head;
+	l.rwlock_acquire_readlock();
         while(tmp->next != NULL){
             if((*tmp->val % 10) == thrId){count[i]++;}
             tmp = tmp->next;
         }
         l.rwlock_release_readlock();
-        sleep(1);
+	//sleep(1);
     }
     return count;
 }
