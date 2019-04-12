@@ -1,20 +1,19 @@
-CFLAGS = -pthread -Wall -g -Wextra -DDebug -pthread
+CFLAGS = -Wall -g -Wextra -DDebug -pthread
+P = readwrite
 
-all: main.o buffer.o rwLock.o
-	g++ $(CFLAGS) main.o buffer.o rwLock.o -o main
+all: $(P)
 
-main.o: main.cpp buffer.h rwLock.h
-	g++ $(CFLAGS) -c main.cpp
+$(P): $(P).o
+	g++ $(CFLAGS) $(P).o -o $(P)
 
-buffer.o: buffer.cpp buffer.h rwLock.h
-	g++ $(CFLAGS) -c buffer.cpp
 
-rwLock.o: rwLock.cpp buffer.h rwLock.h
-	g++ $(CFLAGS) -c rwLock.cpp
+$(P).o: $(P).cpp
+	g++ -c $(CFLAGS) $(P).cpp
+
 
 clean:
-	rm -rf *.o main
+	rm -rf *.o $(P) $(O)
 run: all
-	./main
+	./$(P)
 checkmem: all
 	valgrind -v --leak-check=full --track-origins=yes ./$(P)
