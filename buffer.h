@@ -27,7 +27,6 @@ public:
     };
     void insert(int, int);
     int* read(int, int);
-    ~buffer();
 };
 
 #endif

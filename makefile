@@ -1,4 +1,4 @@
-CFLAGS = -Wall -g -Wextra -DDebug -pthread
+CFLAGS = -pthread -Wall -g -Wextra -DDebug -pthread
 
 all: main.o buffer.o rwLock.o
 	g++ $(CFLAGS) main.o buffer.o rwLock.o -o main
