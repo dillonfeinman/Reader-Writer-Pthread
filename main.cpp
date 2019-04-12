@@ -15,8 +15,9 @@ int num, readers;
 void * write(void * in){
     int *input = (int *) in;
     int threadID = *input;
-
-    //buff.insert(threadID, num);
+    cout << "w1" << endl;
+    buff.insert(threadID, num);
+    cout << "w2" << endl;
 }
 
 void * read(void * in){
@@ -26,7 +27,7 @@ void * read(void * in){
 
     cout << "r1" << endl;
 
-    readCount = buff.read(threadID, num);
+    //readCount = buff.read(threadID, num);
 
     cout << "r2" << endl;
 
