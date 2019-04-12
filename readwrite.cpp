@@ -35,7 +35,8 @@ void * write(void * in){
   args_struct * args = (args_struct *) in;
   int i = (int)args->i;
   int n = (int)args->n;
-  for(int i = 0; i < n; i++){
+  int count = 0;
+  while(count != n){
     pthread_mutex_lock(&wmutex);
     writecount++;
     if(writecount == 1){
@@ -46,6 +47,7 @@ void * write(void * in){
     string ret;
     int randNum = (rand() % 1000) + 1;
     if(randNum % 10 == i){
+	    count++;
 	if(linkedList->head == NULL){
       Node * n = (Node *)malloc(sizeof(Node));
       n->data = randNum;
@@ -96,7 +98,7 @@ void * read(void * in){
       }
 	linkedList->current = linkedList->current->next;
     }
-    cout << correct << endl;
+    cout << "Reader " << i << ": Read " << correct << endl;
     pthread_mutex_lock(&rmutex);
     readcount--;
     if(readcount == 0){
@@ -139,6 +141,14 @@ int main(int argc, char * argv[]){
           rargs.i = i;
           pthread_create(&numRead[i], NULL, read, (void *)&rargs);
         }
+      }
+      for(int i = 0; i < r || i < w; i++){
+	if(i < w){
+		pthread_join(numWrite[i], NULL);
+	}
+	if(i < r){
+		pthread_join(numRead[i], NULL);
+	}
       }
     }
   }
