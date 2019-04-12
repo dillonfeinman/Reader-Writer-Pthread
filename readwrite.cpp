@@ -37,9 +37,9 @@ void * write(void * in){
   cout << "Hey2" << endl;
   int i = (int)args->i;
   int n = (int)args->n;
-  int count = 0;
   cout << "Hey2" << endl;
-  while(count != n){
+  for(int j = 0; j < n; j++){
+    int count = 0;
     cout << "Hey3" << endl;
     pthread_mutex_lock(&wmutex);
     cout << "wmutex acquired" << endl;
@@ -56,6 +56,9 @@ void * write(void * in){
     cout << "resource acquired" << endl;
     string ret;
     int randNum = (rand() % 1000) + 1;
+    while(randNum % 10 != i){
+      randNum = (rand() % 1000) + 1;
+    }
     if(randNum % 10 == i){
 	    count++;
 	    if(linkedList->head == NULL){
@@ -75,7 +78,12 @@ void * write(void * in){
         linkedList->current->next = NULL;
       }
     }
-    cout << "Hey5" << endl;
+    linkedList->current = linkedList->head;
+    while(linkedList->current->next != NULL){
+      cout << linkedList->current-> data << ", " << endl;
+      linkedList->current = linkedList->current->next;
+    }
+    cout << linkedList->current-> data << "." << endl;
     pthread_mutex_unlock(&resource);
     cout << "resource unlocked" << endl;
     pthread_mutex_lock(&wmutex);
@@ -103,17 +111,21 @@ void * read(void * in){
     cout << "Hi3" << endl;
     cout << "Hi4" << endl;
     pthread_mutex_lock(&readTry);
+    cout << "readTry locked" << endl;
     cout << "Hi5" << endl;
     pthread_mutex_lock(&rmutex);
+    cout << "rmutex acquired" << endl;
     cout << "Hi6" << endl;
     readcount++;
     if(readcount == 1){
       cout << "lock res" << endl;
       pthread_mutex_lock(&resource);
+      cout << "res acquired" << endl;
     }
     pthread_mutex_unlock(&rmutex);
+    cout << "rmutex unloc" << endl;
     pthread_mutex_unlock(&readTry);
-    cout << "Hi4" << endl;
+    cout << "readtry unlock" << endl;
     linkedList->current = linkedList->head;
     while(linkedList->current->next != NULL){
       cout << "am i here" << endl;
@@ -154,9 +166,9 @@ int main(int argc, char * argv[]){
       rargs.n = n;
       pthread_t * numRead = new pthread_t[r];
       pthread_t * numWrite = new pthread_t[w];
+      linkedList->current = NULL;
+      linkedList->head = NULL;
       for(int i = 0; i < r || i < w; i++){
-        linkedList->current = NULL;
-        linkedList->head = NULL;
         if(i < w){
           wargs.i = i;
           pthread_create(&numWrite[i], NULL, write, (void *)&wargs);
@@ -167,12 +179,12 @@ int main(int argc, char * argv[]){
         }
       }
       for(int i = 0; i < r || i < w; i++){
-	if(i < w){
-		pthread_join(numWrite[i], NULL);
-	}
-	if(i < r){
-		pthread_join(numRead[i], NULL);
-	}
+      	if(i < w){
+      		pthread_join(numWrite[i], NULL);
+      	}
+      	if(i < r){
+      		pthread_join(numRead[i], NULL);
+      	}
       }
     }
   }
