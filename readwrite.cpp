@@ -32,35 +32,30 @@ pthread_mutex_t resource = PTHREAD_MUTEX_INITIALIZER;
 LinkedList * linkedList = (LinkedList *)malloc(sizeof(LinkedList));
 
 void * write(void * in){
-  cout << "Hey" << endl;
+
   args_struct * args = (args_struct *) in;
-  cout << "Hey2" << endl;
+
   int i = (int)args->i;
   int n = (int)args->n;
-  cout << "Hey2" << endl;
+
   for(int j = 0; j < n; j++){
-    int count = 0;
-    cout << "Hey3" << endl;
+
     pthread_mutex_lock(&wmutex);
-    cout << "wmutex acquired" << endl;
+
     writecount++;
-    cout << "Hey5" << endl;
+
     if(writecount == 1){
       pthread_mutex_lock(&readTry);
-      cout << "readTry acquired" << endl;
+
     }
     pthread_mutex_unlock(&wmutex);
-    cout << "wmutex unlocked" << endl;
-    cout << "lock res" << endl;
     pthread_mutex_lock(&resource);
-    cout << "resource acquired" << endl;
     string ret;
     int randNum = (rand() % 1000) + 1;
     while(randNum % 10 != i){
       randNum = (rand() % 1000) + 1;
     }
     if(randNum % 10 == i){
-	    count++;
 	    if(linkedList->head == NULL){
           Node * n = (Node *)malloc(sizeof(Node));
           n->data = randNum;
@@ -78,63 +73,44 @@ void * write(void * in){
         linkedList->current->next = NULL;
       }
     }
-    linkedList->current = linkedList->head;
-    while(linkedList->current->next != NULL){
-      cout << linkedList->current-> data << ", " << endl;
-      linkedList->current = linkedList->current->next;
-    }
-    cout << linkedList->current-> data << "." << endl;
     pthread_mutex_unlock(&resource);
-    cout << "resource unlocked" << endl;
     pthread_mutex_lock(&wmutex);
-    cout << "wmutex locked" << endl;
     writecount--;
     if(writecount == 0){
       pthread_mutex_unlock(&readTry);
-      cout << "readtry unlocked" << endl;
     }
     pthread_mutex_unlock(&wmutex);
-    cout << "wmutex unlocked" << endl;
   }
-  usleep(10);
+  usleep(1000000);
   return NULL;
 }
 
 void * read(void * in){
-  cout << "Hi" << endl;
   args_struct * args = (args_struct *) in;
   int i = (int)args->i;
   int n = (int)args->n;
-  int correct = 0;
-  cout << "Hi2" << endl;
-  for(int j = 0; j < n; j++){
-    cout << "Hi3" << endl;
-    cout << "Hi4" << endl;
+  for(int j = 1; j < n+1; j++){
+    int correct = 0;
     pthread_mutex_lock(&readTry);
-    cout << "readTry locked" << endl;
-    cout << "Hi5" << endl;
     pthread_mutex_lock(&rmutex);
-    cout << "rmutex acquired" << endl;
-    cout << "Hi6" << endl;
     readcount++;
     if(readcount == 1){
-      cout << "lock res" << endl;
       pthread_mutex_lock(&resource);
-      cout << "res acquired" << endl;
     }
     pthread_mutex_unlock(&rmutex);
-    cout << "rmutex unloc" << endl;
     pthread_mutex_unlock(&readTry);
-    cout << "readtry unlock" << endl;
     linkedList->current = linkedList->head;
+    cout << "here" <<endl;
     while(linkedList->current->next != NULL){
-      cout << "am i here" << endl;
-      if(linkedList->current->data % 10 == i){
-        correct++;
+
+      if(linkedList->current != NULL){
+        if(linkedList->current->data % 10 == i){
+          correct++;
+        }
+  	    linkedList->current = linkedList->current->next;
       }
-	    linkedList->current = linkedList->current->next;
     }
-    cout << "Reader " << i << ": Read " << correct << endl;
+    cout << "Reader " << i << ": Read " << j << ": " << correct << endl;
     pthread_mutex_lock(&rmutex);
     readcount--;
     if(readcount == 0){
@@ -142,7 +118,7 @@ void * read(void * in){
     }
     pthread_mutex_unlock(&rmutex);
   }
-  usleep(10);
+  usleep(1000000);
   return NULL;
 }
 
@@ -169,12 +145,14 @@ int main(int argc, char * argv[]){
       linkedList->current = NULL;
       linkedList->head = NULL;
       for(int i = 0; i < r || i < w; i++){
+        wargs.i = i+1;
+        rargs.i = i+1;
         if(i < w){
-          wargs.i = i;
+          cout << i;
           pthread_create(&numWrite[i], NULL, write, (void *)&wargs);
         }
         if(i < r){
-          rargs.i = i;
+          cout << i;
           pthread_create(&numRead[i], NULL, read, (void *)&rargs);
         }
       }
