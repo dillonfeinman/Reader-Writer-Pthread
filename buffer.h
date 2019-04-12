@@ -6,8 +6,8 @@ public:
     int *val;
     node *next;
 
-    node(int *v){
-        val = v;
+    node(int v){
+        *val = v;
         next = nullptr;
     }
 };
@@ -23,7 +23,7 @@ public:
         curr = nullptr;
     };
     void insert(int, int);
-    int read(int);
+    int* read(int, int);
     ~buffer();
 };
 
