@@ -16,7 +16,7 @@ int num, readers;
 void * write(void * in){
     int *input = (int *) in;
     int threadID = *input;
-    //buff.insert(threadID, num);
+    buff.insert(threadID, num);
 }
 
 void * read(void * in){
@@ -24,7 +24,7 @@ void * read(void * in){
     int threadID = *input;
     int *readCount = (int *)malloc(sizeof(int)*num);
 
-    //readCount = buff.read(threadID, num);
+    readCount = buff.read(threadID, num);
 
     //file output
     string outfile = "reader_" + to_string(threadID) + ".txt";

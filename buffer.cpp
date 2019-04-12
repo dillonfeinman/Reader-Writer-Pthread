@@ -16,45 +16,40 @@ bool writer = false;
 int reads = 0;
 
 void buffer::insert(int thrId, int num){
-    cout << "thread: " << thrId << "insert start" << endl;
     for(int i = 0; i < num; i++){
 	if(reads==0){
 		pthread_mutex_lock(&wl);
 		writer = false;
 		this->curr = this->head;
-	        srand(time(0));
 		for(;;){
 			int val = rand() % 1000 + 1;
 			if((val%10)==thrId){
-				//cout << "need to insert: " << val << endl;
 				if(this->curr==NULL){
-					cout <<1;
+					cout << "hey" << endl;
 					node *n = (node *)malloc(sizeof(node));
-					cout << 2;
 					node tmp = node(val);
-					cout << 3;
-					*n = tmp;
-					cout << n->val << endl;
-					//*n = tmp;
-					//this->curr = n;
-					//this->head = this->curr;
-					//cout << "val inserted at head" << endl;
+					cout << "hey2" << endl;
+					n = &tmp;
+					this->curr = n;
+					this->curr->next = NULL;
+					this->head = this->curr;
+					
 				}
 				else{
-					//cout << "non-empty list" << endl;
 					for(;;){
 						if(this->curr->next==NULL){
-							//node *n = (node *)malloc(sizeof(node));
-							//node tmp = node(val);
-							//*n = tmp;
-							//this->curr->next = n;
+							node *n = (node *)malloc(sizeof(node));
+							node tmp = node(val);
+							n = &tmp;
+							this->curr->next = n;
+							this->curr = this->curr->next;
+							this->curr->next = NULL;
 						       	break;	
 						} else {
 							this->curr = this->curr->next;
 						}
 						
 					}
-					//cout << "val inserted at tail" << endl;
 				}
 				break;
 			}
@@ -81,26 +76,26 @@ int* buffer::read(int thrId, int num){
         count[i] = 0;
 	i++;
     }
-    i = 0;
-    while(i < num){
+	cout << "here" << endl;
+    for(int j = 0; j < num; j++){
 	pthread_mutex_lock(&readCount);
+	cout << "here2" << endl;
 	reads++;
-	cout << reads << endl;
 	pthread_mutex_unlock(&readCount);
-
+	cout << "here3" << endl;
         node *tmp = this->head;
+	cout << "here4" << endl;
         while(tmp != NULL){
-            if((*tmp->val % 10) == thrId){count[i]++;}
+            if((tmp->val % 10) == thrId){count[j]++;}
             tmp = tmp->next;
         }
+	cout << "here5" << endl;
 	
 	pthread_mutex_lock(&readCount);
 	reads--;
-	cout << reads << endl;
 	if(reads==0){pthread_cond_signal(&noRead);}
 	pthread_mutex_unlock(&readCount);
 	nanosleep(0, NULL);
-	i++;
     }
     cout << "read done" << endl;
     return count;

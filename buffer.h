@@ -6,11 +6,11 @@
 
 class node{
 public:
-    int *val;
+    int val;
     node *next;
 
     node(int v){
-        *val = v;
+        val = v;
         next = NULL;
     }
 };
