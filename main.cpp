@@ -22,7 +22,7 @@ pthread_mutex_t re = PTHREAD_MUTEX_INITIALIZER;
 
 void * read(void * in){
     int *input = (int *) in;
-    int thr = *input+1;
+    int thr = *input;
     int *count = (int *)malloc(sizeof(int)*num);
     for(int i = 0; i < num; i++){
         count[i]=0;
@@ -42,17 +42,22 @@ void * read(void * in){
 
         //Read list
         node *tmp = list->head;
-        int k = 0;
-        while(tmp->val != NULL){
+        while(tmp->next != NULL){
             if((tmp->val % 10) == thr){
-                count[k]++;
+                count[i]++;
             }
             tmp = tmp->next;
-	    k++;
         }
+        cout << "here" << endl;
         //////////
+        cout << count[i] << endl;
+        string out = "reader_" + to_string(thr) + ".txt";
 
-
+    	ofstream o (out);
+    	for(int i = 0; i < num; i++){
+        o << "Reader " << thr << ": Read " << i << ": " << count[i] << " values ending in " << thr << endl; 
+    }
+    	o.close();
         //Exit
         pthread_mutex_lock(&rm);
         reader--;
@@ -60,29 +65,25 @@ void * read(void * in){
              pthread_mutex_unlock(&re);
         }
         pthread_mutex_unlock(&rm);
+        usleep(100000);
     }
 
     //Write output
-    string out = "reader_" + to_string(thr) + ".txt";
-
-    ofstream o (out);
-    for(int i = 0; i < num; i++){
-        o << "Reader " << thr << ": Read " << count[i] << " values ending in " << thr << endl; 
-    }
-    o.close();
 }
 
 void * write(void * in){
     for(int e = 0; e < num; e++){
     	  pthread_mutex_lock(&wm);
+    	  if(writer == 1){
           pthread_mutex_lock(&rt);
+    	  }
   	  pthread_mutex_lock(&re);
 
 	  //Critical section
   	  int *input = (int *) in;
   	  int thr = *input;
 
-	  cout << thr << endl;
+	  // cout << thr << endl;
 
   	  int val;
   	  for(;;){
@@ -101,17 +102,17 @@ void * write(void * in){
   	 	list->tail->next = n;
 		list->tail = n;
 	  }
-	node *tmp = list->head;
-    while(tmp->next != NULL){
-		cout << tmp->val << "->";
-		tmp = tmp->next;
-    }	
-    cout << tmp->val << endl;
+	// node *tmp = list->head;
+ //    while(tmp->next != NULL){
+	// 	cout << tmp->val << "->";
+	// 	tmp = tmp->next;
+ //    }	
+ //    cout << tmp->val << endl;
 	  //Exit
   	  pthread_mutex_unlock(&re);
   	  pthread_mutex_unlock(&rt);
   	  pthread_mutex_unlock(&wm);
-	  usleep(50);
+	  usleep(100000);
     }
     cout << "done" << endl;
     return NULL;
@@ -143,7 +144,7 @@ int main(int argc, char * argv[]){
             for(int i = 0; i < r; i++){
                 int *v = (int *)malloc(sizeof(int));
 		*v = i+1;
-                //pthread_create(&readers[r], NULL, read, v);
+                pthread_create(&readers[r], NULL, read, v);
             }
 
             //rejoin threads
@@ -151,7 +152,7 @@ int main(int argc, char * argv[]){
                 pthread_join(writers[i], NULL);
             }
             for(int i = 0; i < r; i ++){
-                //pthread_join(readers[r], NULL);
+                pthread_join(readers[r], NULL);
             }
         }
     }
