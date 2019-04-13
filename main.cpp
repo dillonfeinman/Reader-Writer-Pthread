@@ -82,9 +82,7 @@ void * read(void * in){
 void * write(void * in){
     for(int e = 0; e < num; e++){
     	  pthread_mutex_lock(&wm);
-    	  if(writer == 1){
           pthread_mutex_lock(&rt);
-    	  }
   	  pthread_mutex_lock(&re);
 
 	  //Critical section
@@ -178,7 +176,7 @@ int main(int argc, char * argv[]){
               }
                 pthread_join(readers[i], NULL);
             }
-        }
+	}
     }
     return 0;
 }
