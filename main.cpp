@@ -22,7 +22,7 @@ pthread_mutex_t rt = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t re = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
-void * wait(void * in){
+void * wait(void *){
   pthread_mutex_lock(&waitMutex);
   pthread_cond_wait(&c, &waitMutex);
   cout << "Almost Done!" << endl;
