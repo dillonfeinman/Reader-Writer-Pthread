@@ -1,5 +1,5 @@
 CFLAGS = -Wall -g -Wextra -DDebug -pthread
-P = main
+P = readwrite
 
 all: $(P)
 
