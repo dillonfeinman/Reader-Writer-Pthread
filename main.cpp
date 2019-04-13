@@ -56,7 +56,7 @@ void * read(void * in){
 
     	ofstream o (out);
     	for(int i = 0; i < num; i++){
-        o << "Reader " << thr << ": Read " << i << ": " << count[i] << " values ending in " << thr << endl;
+        o << "Reader " << thr << ": Read " << (i+1) << ": " << count[i] << " values ending in " << thr << endl;
     }
     	o.close();
         //Exit
@@ -68,8 +68,6 @@ void * read(void * in){
         pthread_mutex_unlock(&rm);
         usleep(100000);
     }
-
-    //Write output
 }
 
 void * write(void * in){
