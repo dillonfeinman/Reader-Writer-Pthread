@@ -12,7 +12,7 @@ $(P).o: $(P).cpp node.h llist.h
 
 
 clean:
-	rm -rf *.o $(P) $(O) *.txt
+	rm -rf *.o $(P) $(O)
 run: all
 	./$(P)
 checkmem: all
