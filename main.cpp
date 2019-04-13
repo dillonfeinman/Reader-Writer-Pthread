@@ -75,7 +75,7 @@ void * read(void * in){
              pthread_mutex_unlock(&re);
         }
         pthread_mutex_unlock(&rm);
-        usleep(100000);
+        usleep(100000000);
     }
 }
 
@@ -120,7 +120,7 @@ void * write(void * in){
   	  pthread_mutex_unlock(&re);
   	  pthread_mutex_unlock(&rt);
   	  pthread_mutex_unlock(&wm);
-	  usleep(100000);
+	  usleep(100000000);
     }
     cout << "done" << endl;
     return NULL;
