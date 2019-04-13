@@ -179,6 +179,14 @@ int main(int argc, char * argv[]){
                 pthread_join(readers[i], NULL);
             }
         }
+        node * tmp = list->head;
+        node * tmp2 = tmp;
+        while (tmp2->next != NULL){
+          tmp = tmp2;
+          tmp2 = tmp->next;
+          free(tmp);
+        }
+        free(tmp2);
     }
     return 0;
 }
