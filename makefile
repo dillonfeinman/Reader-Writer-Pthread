@@ -1,5 +1,5 @@
 CFLAGS = -Wall -g -Wextra -DDebug -pthread
-P = readwrite
+P = main
 
 all: $(P)
 
@@ -12,7 +12,7 @@ $(P).o: $(P).cpp
 
 
 clean:
-	rm -rf *.o $(P) $(O)
+	rm -rf *.o $(P) $(O) *.txt
 run: all
 	./$(P)
 checkmem: all

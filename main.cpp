@@ -27,6 +27,7 @@ void * wait(void * in){
   pthread_cond_wait(&c, &waitMutex);
   cout << "Almost Done!" << endl;
   pthread_mutex_unlock(&waitMutex);
+  return NULL;
 }
 
 void * read(void * in){
@@ -51,16 +52,13 @@ void * read(void * in){
 
         //Read list
         node *tmp = list->head;
-        int k = 0;
         while(tmp->next != NULL){
             if((tmp->val % 10) == thr){
                 count[i]++;
             }
             tmp = tmp->next;
         }
-        cout << "here" << endl;
         //////////
-        cout << count[i] << endl;
         string out = "reader_" + to_string(thr) + ".txt";
 
     	ofstream o (out);
@@ -77,6 +75,7 @@ void * read(void * in){
         pthread_mutex_unlock(&rm);
         usleep(100000);
     }
+    return NULL;
 }
 
 void * write(void * in){
@@ -122,7 +121,6 @@ void * write(void * in){
   	  pthread_mutex_unlock(&wm);
 	  usleep(100000);
     }
-    cout << "done" << endl;
     return NULL;
 }
 
@@ -160,8 +158,10 @@ int main(int argc, char * argv[]){
             //rejoin threads
             for(int i = 0; i < w; i++){
               if(w>r && i == w-2){
-                pthread_join(writers[i], NULL);
                 pthread_cond_signal(&c);
+                pthread_join(waiter, NULL);
+                pthread_join(writers[i], NULL);
+                
               } else if(r == w && i == w-2){
                 pthread_cond_signal(&c);
                 pthread_join(waiter, NULL);
