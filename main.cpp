@@ -166,27 +166,26 @@ int main(int argc, char * argv[]){
                 pthread_cond_signal(&c);
                 pthread_join(waiter, NULL);
                 pthread_join(writers[i], NULL);
+              } else if(r>w && i == w-2){
+                pthread_cond_signal(&c);
+                pthread_join(waiter, NULL);
+                pthread_join(writers[i], NULL);
               }
               else
                 pthread_join(writers[i], NULL);
             }
             for(int i = 0; i < r; i ++){
-              if(r>w && i == r-2){
-                pthread_cond_signal(&c);
-                pthread_join(waiter, NULL);
-                pthread_join(readers[i], NULL);
-              }
                 pthread_join(readers[i], NULL);
             }
         }
-        // node * tmp = list->head;
-        // node * tmp2 = tmp;
-        // while (tmp2->next != NULL){
-        //   tmp = tmp2;
-        //   tmp2 = tmp->next;
-        //   free(tmp);
-        // }
-        // free(tmp2);
+        node * tmp = list->head;
+        node * tmp2 = tmp;
+        while (tmp2->next != NULL){
+           tmp = tmp2;
+          tmp2 = tmp->next;
+          free(tmp);
+        }
+        free(tmp2);
     }
     return 0;
 }
