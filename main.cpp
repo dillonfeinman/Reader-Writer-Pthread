@@ -42,6 +42,7 @@ void * read(void * in){
 
         //Read list
         node *tmp = list->head;
+        int k = 0;
         while(tmp->next != NULL){
             if((tmp->val % 10) == thr){
                 count[i]++;
@@ -55,7 +56,7 @@ void * read(void * in){
 
     	ofstream o (out);
     	for(int i = 0; i < num; i++){
-        o << "Reader " << thr << ": Read " << i << ": " << count[i] << " values ending in " << thr << endl; 
+        o << "Reader " << thr << ": Read " << i << ": " << count[i] << " values ending in " << thr << endl;
     }
     	o.close();
         //Exit
@@ -106,7 +107,7 @@ void * write(void * in){
  //    while(tmp->next != NULL){
 	// 	cout << tmp->val << "->";
 	// 	tmp = tmp->next;
- //    }	
+ //    }
  //    cout << tmp->val << endl;
 	  //Exit
   	  pthread_mutex_unlock(&re);
@@ -134,7 +135,7 @@ int main(int argc, char * argv[]){
         } else {
             pthread_t writers[w];
             pthread_t readers[r];
-            
+
             //Create threads
             for(int i = 0; i < w; i++){
                 int *v = (int *)malloc(sizeof(int));
