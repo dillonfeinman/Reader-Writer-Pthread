@@ -152,7 +152,7 @@ int main(int argc, char * argv[]){
             for(int i = 0; i < r; i++){
                 int *v = (int *)malloc(sizeof(int));
 		*v = i+1;
-                pthread_create(&readers[r], NULL, read, v);
+                pthread_create(&readers[i], NULL, read, v);
             }
 
             //rejoin threads
