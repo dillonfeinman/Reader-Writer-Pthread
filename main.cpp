@@ -16,9 +16,18 @@ int writer = 0;
 llist *list;
 
 pthread_mutex_t rm = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t waitMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wm = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t rt = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t re = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t c = PTHREAD_COND_INITIALIZER;
+
+void * wait(void * in){
+  pthread_mutex_lock(&waitMutex);
+  pthread_cond_wait(&c, &waitMutex);
+  cout << "Almost Done!" << endl;
+  pthread_mutex_unlock(&waitMutex);
+}
 
 void * read(void * in){
     int *input = (int *) in;
@@ -135,8 +144,10 @@ int main(int argc, char * argv[]){
         } else {
             pthread_t writers[w];
             pthread_t readers[r];
+            pthread_t waiter;
 
             //Create threads
+            pthread_create(&waiter, NULL, wait, NULL);
             for(int i = 0; i < w; i++){
                 int *v = (int *)malloc(sizeof(int));
 		*v = i+1;
@@ -150,10 +161,24 @@ int main(int argc, char * argv[]){
 
             //rejoin threads
             for(int i = 0; i < w; i++){
+              if(w>r && i == w-2){
+                pthread_join(writers[i], NULL);
+                pthread_cond_signal(&c);
+              } else if(r == w && i == w-2){
+                pthread_cond_signal(&c);
+                pthread_join(waiter, NULL);
+                pthread_join(writers[i], NULL);
+              }
+              else
                 pthread_join(writers[i], NULL);
             }
             for(int i = 0; i < r; i ++){
-                pthread_join(readers[r], NULL);
+              if(r>w && i == r-2){
+                pthread_cond_signal(&c);
+                pthread_join(waiter, NULL);
+                pthread_join(readers[i], NULL);
+              }
+                pthread_join(readers[i], NULL);
             }
         }
     }
