@@ -13,6 +13,15 @@ class llist{
 			head = NULL;
 			tail = NULL;
 		};
+
+		~llist(){
+			while(head != tail){
+				node *tmp = head;
+				head = head->next;
+				free(tmp);
+			}
+			free(head);
+		}
 };
 
 #endif

@@ -7,7 +7,7 @@ $(P): $(P).o
 	g++ $(CFLAGS) $(P).o -o $(P)
 
 
-$(P).o: $(P).cpp
+$(P).o: $(P).cpp node.h llist.h
 	g++ -c $(CFLAGS) $(P).cpp
 
 

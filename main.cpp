@@ -33,6 +33,8 @@ void * wait(void *){
 void * read(void * in){
     int *input = (int *) in;
     int thr = *input;
+    string out = "reader_" + to_string(thr) + ".txt";
+    ofstream o (out);
     int *count = (int *)malloc(sizeof(int)*num);
     for(int i = 0; i < num; i++){
         count[i]=0;
@@ -59,14 +61,9 @@ void * read(void * in){
             tmp = tmp->next;
         }
         //////////
-        string out = "reader_" + to_string(thr) + ".txt";
+    	o << "Reader " << thr << ": Read " << (i+1) << ": " << count[i] << " values ending in " << thr << endl;
 
-    	ofstream o (out);
-    	for(int i = 0; i < num; i++){
-        o << "Reader " << thr << ": Read " << (i+1) << ": " << count[i] << " values ending in " << thr << endl;
-    }
-    	o.close();
-        //Exit
+	//Exit
         pthread_mutex_lock(&rm);
         reader--;
         if(reader==0){
@@ -75,6 +72,9 @@ void * read(void * in){
         pthread_mutex_unlock(&rm);
         usleep(100000);
     }
+    o.close();
+    free(input);
+    free(count);
     return NULL;
 }
 
@@ -115,6 +115,9 @@ void * write(void * in){
 	// 	tmp = tmp->next;
  //    }
  //    cout << tmp->val << endl;
+ 	
+	  //free(input);
+
 	  //Exit
   	  pthread_mutex_unlock(&re);
   	  pthread_mutex_unlock(&rt);

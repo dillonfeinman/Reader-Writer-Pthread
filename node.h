@@ -12,6 +12,10 @@ class node{
 			val = v;
 			next = NULL;
 		};
+
+		~node(){
+			free(next);
+		}
 };
 
 #endif
