@@ -22,7 +22,7 @@ pthread_mutex_t re = PTHREAD_MUTEX_INITIALIZER;
 
 void * read(void * in){
     int *input = (int *) in;
-    int thr = *input+1;
+    int thr = *input;
     int *count = (int *)malloc(sizeof(int)*num);
     for(int i = 0; i < num; i++){
         count[i]=0;
@@ -43,7 +43,7 @@ void * read(void * in){
         //Read list
         node *tmp = list->head;
         int k = 0;
-        while(tmp->val != NULL){
+        while(tmp->next != NULL){
             if((tmp->val % 10) == thr){
                 count[k]++;
             }
@@ -143,7 +143,7 @@ int main(int argc, char * argv[]){
             for(int i = 0; i < r; i++){
                 int *v = (int *)malloc(sizeof(int));
 		*v = i+1;
-                //pthread_create(&readers[r], NULL, read, v);
+                pthread_create(&readers[r], NULL, read, v);
             }
 
             //rejoin threads
@@ -151,7 +151,7 @@ int main(int argc, char * argv[]){
                 pthread_join(writers[i], NULL);
             }
             for(int i = 0; i < r; i ++){
-                //pthread_join(readers[r], NULL);
+                pthread_join(readers[r], NULL);
             }
         }
     }
